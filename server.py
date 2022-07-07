@@ -2,6 +2,7 @@ import socket
 import threading
 
 
+
 #Define HOST IP,PORT and Max allowed clients which can be connected to server
 HOST = "127.0.0.1"
 PORT = 6969     
@@ -17,7 +18,7 @@ def Message_listner(client:object,username:str) -> None:
     while True:
         message = client.recv(2048).decode("utf-8")
         if message!="":
-            final_formatted_message = username + "> " + message
+            final_formatted_message = username + ">" + message
             Broadcast_message(final_formatted_message)
         else:
             print(f"No message was sent by {username}.")
@@ -51,7 +52,7 @@ def Client_handler(client:object) -> None:
         username = client.recv(1024).decode('utf-8')
         if username!='':
             ACTIVE_CLIENTS.append((username,client))
-            new_joiner_prompt = "SERVER" + f"{username} joined the chat."
+            new_joiner_prompt = "SERVER>" + f" {username} joined the chat."
             Broadcast_message(new_joiner_prompt)
             break
         else:
@@ -62,7 +63,6 @@ def main() -> None:
     '''This function will create the server side socket object and will bind it to 
        the HOST IP address and PORT.
     '''
-    
     #creating server side socket object, here "AF_INET" represents IPv4 and "SOCK_STREAM" represents TCP protocol
     server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     try:

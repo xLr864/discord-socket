@@ -27,13 +27,17 @@ def Listen_for_messages(client:object) -> None:
         the message and print it to the client.
     '''
     while True:
-        message = client.recv(2048).decode("utf-8")
-        if message!="":
-            username = message.split("> ")[0]
-            content = message.split("> ")[1]
-            print(f"[{username}] {content}")
-        else:
-            print("Message recieved from the client is empty.")
+        try:
+            message = client.recv(2048).decode("utf-8")
+            if message!="":
+                username = message.split(">")[0]
+                content = message.split(">")[1]
+                print(f"[{username}]:-  {content}")
+            else:
+                print("Message recieved from the client is empty.")
+        except:
+            print("Server unavailable/offline.")
+            exit(0)
 
 #This function will send the message from client to the server 
 def send_message(client:object) -> None:
@@ -41,7 +45,7 @@ def send_message(client:object) -> None:
         message to all other clients or the users.
     '''
     while True:
-        message = input("message:- ")
+        message = input(">")
         if message!="":
             client.sendall(message.encode())
         else:
