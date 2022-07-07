@@ -1,6 +1,5 @@
-import socket
+import socket,sys
 import threading
-
 
 
 #Define HOST IP,PORT and Max allowed clients which can be connected to server
@@ -16,19 +15,27 @@ def Message_listner(client:object,username:str) -> None:
         the message and print it to the client.
     '''
     while True:
-        message = client.recv(2048).decode("utf-8")
-        if message!="":
-            final_formatted_message = username + ">" + message
-            Broadcast_message(final_formatted_message)
-        else:
-            print(f"No message was sent by {username}.")
+        try:
+            message = client.recv(2048).decode("utf-8")
+            if message!="":
+                final_formatted_message = username + ">" + message
+                Broadcast_message(final_formatted_message)
+            else:
+                print(f"No message was sent by {username}.")
+        except Exception as e:
+            print(f"Communication failed due to:\n{e}")
+            break
+
 
 #This function will send message to the client from the server
 def Send_message_to_client(client:object,message:str) -> None: 
     '''This function will take client socket and message as an argumrent and will send
         it to the rest of the connected clients.
     '''
-    client.sendall(message.encode())
+    try:
+        client.sendall(message.encode())
+    except:
+        print("Unavle to send message, Reciever maybe disconnected...")
 
 #Function to send new message to all the clients that are currently connected to the server.
 def Broadcast_message(message:str) -> None: 
@@ -57,6 +64,7 @@ def Client_handler(client:object) -> None:
             break
         else:
             print("Error no username was provided, Please try again.")
+            sys.exit(0)
     threading.Thread(target=Message_listner,args=(client,username)).start()
 
 def main() -> None: 

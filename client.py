@@ -1,22 +1,7 @@
-import socket
+import socket,sys
 import threading
-import tkinter as tk
 
-#initialize Tkinter window with default size and title
-# root = tk.Tk()
-# WIDTH = 600
-# HEIGHT = 600
-# RESIZABLE_BY_WIDTH = False
-# RESIZABLE_BY_HEIGHT = False
-# root.geometry(f"{WIDTH}x{HEIGHT}")
-# root.title("Discord")
-# root.resizable(RESIZABLE_BY_WIDTH,RESIZABLE_BY_HEIGHT)
 
-# top_frame = tk.Frame(width=600,height=100,bg="red")
-# middle_frame = tk.Frame(width=600,height=400,bg="green")
-# bottom_frame = tk.Frame(width=600,height=100,bg="blue")
-
-#Define HOST IP,PORT and to server
 HOST = "127.0.0.1"
 PORT = 6969     
 
@@ -37,20 +22,30 @@ def Listen_for_messages(client:object) -> None:
                 print("Message recieved from the client is empty.")
         except:
             print("Server unavailable/offline.")
-            exit(0)
+            sys.exit(0)
 
 #This function will send the message from client to the server 
 def send_message(client:object) -> None:
     '''This function will take message as input and it will encode and broadcast the
         message to all other clients or the users.
     '''
+    error = 0
     while True:
-        message = input(">")
-        if message!="":
-            client.sendall(message.encode())
-        else:
-            print("No message was written")
-            exit(0)
+        try:
+            message = input(">")
+            if message!="":
+                client.sendall(message.encode())
+            else:
+                print("No message was written")
+                error = 1
+                break
+        except:
+            error = 1
+            print("Connection was closed, Try again later.")
+            break
+
+    if(error):
+        sys.exit(0)
 
 #This function will communicate to the server and pass a username to it
 def communicate_to_server(client:object) -> None:
@@ -62,7 +57,7 @@ def communicate_to_server(client:object) -> None:
         client.sendall(username.encode())
     else:
         print("Username can not be empty")
-        exit(0)
+        sys.exit(0)
 
     threading.Thread(target=Listen_for_messages,args=(client,)).start()
     send_message(client)
@@ -78,6 +73,7 @@ def main():
         print("Successfully connected to the server")
     except:
         print(f"Unable to connect to the server {HOST} PORT:{PORT}")
+        exit(0)
 
     communicate_to_server(client)
 
